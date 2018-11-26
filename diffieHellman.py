@@ -32,9 +32,9 @@ class DiffieHellman():
         default_keyLength = 540
 
         default_generator = 2
-        valid_generators = [2, 3, 5, 7, 11] #Must be primes. Some are not passing on the Legendre Symbol, why?
+        valid_generators = [2, 3, 5, 7, 11] #Must be primes.
 
-        # Sanity check for generator, group and keyLength
+        # Sanity check for generator
         if (generator not in valid_generators):
             print ("Error: Invalid generator. Default (2) will be used instead.")
             self.generator = default_generator
