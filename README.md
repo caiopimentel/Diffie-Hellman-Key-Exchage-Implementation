@@ -1,5 +1,5 @@
 # Diffie-Hellman Key Exchage
-This is an functional implementation of the Diffie-Hellman key exchange protocol (a method of securely exchanging cryptographic keys over a public, untrustworthy, channel) in Python for just fun and practice. This implementation was mainly based on [lowazo's pyDHE](https://github.com/lowazo/pyDHE) reference implementation of DH. 
+This is a functional implementation of the Diffie-Hellman key exchange protocol (a method of securely exchanging cryptographic keys over a public, untrustworthy, channel) in Python for just fun and practice. This implementation was mainly based on [lowazo's pyDHE](https://github.com/lowazo/pyDHE) reference implementation of DH. 
 
 **WARNING: Don't use it on any real world application.** There are a ton of audited and tested implementations of DH to be used out there.
 
