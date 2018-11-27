@@ -22,17 +22,17 @@ class DiffieHellman():
     https://datatracker.ietf.org/doc/rfc3526/
     """
 
-    def __init__ (self, generator = 2, group = 17, keyLenght=540):
+    def __init__ (self, generator = 2, group = 17, keyLenght=2024):
         """
         Generate the public and private keys
         """
         
         #Lenght in bits
-        min_keyLength = 180
-        default_keyLength = 540
+        min_keyLength = 1024
+        default_keyLength = 2024
 
         default_generator = 2
-        valid_generators = [2, 3, 5, 7, 11] #Must be primes.
+        valid_generators = [2, 3, 7] #Must be primes
 
         # Sanity check for generator
         if (generator not in valid_generators):
@@ -55,6 +55,7 @@ class DiffieHellman():
         self.privateKey = self.generatePrivateKey(self.keyLenght)
         self.publicKey = self.generatePublicKey()
 
+
     def getPrime(self, group = 17):
         """
         Returns the correspondent prime.
@@ -74,19 +75,21 @@ class DiffieHellman():
             print("Error: No prime with group",group,"Using default,",default_group,".")
             return primes[default_group]
 
+
     def generateRandomNumber(self, bits):
         """
         Generate a random number with the specified number of bits
         (https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator)
         """
 
-        _rand = 0
+        randomNumber = 0
         _bytes = bits // 8 + 8
 
-        while (_rand.bit_length() < bits):
-            _rand = int.from_bytes(random_function(_bytes), byteorder='big')
+        while (randomNumber.bit_length() < bits):
+            randomNumber = int.from_bytes(random_function(_bytes), byteorder='big')
         
-        return _rand
+        return randomNumber
+
 
     def generatePrivateKey(self, bits):
         """
@@ -95,11 +98,13 @@ class DiffieHellman():
 
         return self.generateRandomNumber(bits)
 
+
     def generatePublicKey(self):
         """
         Generate public key with generator ** privateKey % prime
         """
         return pow(self.generator, self.privateKey, self.prime)
+
 
     def testReceiverPublicKey (self, receiverPublicKey):
         """
@@ -115,6 +120,7 @@ class DiffieHellman():
                 return True
         return False
 
+
     def generateSharedSecret(self, privateKey, receiverPublicKey):
         """
         Generates the shared secret after checking if receiverPublicKey is valid.
@@ -125,6 +131,7 @@ class DiffieHellman():
             return sharedSecret
         else:
             raise Exception ("Invalid public key.")
+
 
     def generateSharedKey (self, receiverPublicKey):
         """
@@ -138,15 +145,17 @@ class DiffieHellman():
         except AttributeError:
             _sharedSecretBytes = str(self.sharedSecret)
 
-        shared = hashlib.sha256()
+        shared = hashlib.sha512()
         shared.update(bytes(_sharedSecretBytes))
         self.key = shared.digest()
+
 
     def getSharedKey (self):
         """
         Return shared secret Key
         """
         return self.key
+
 
     def displayParameters (self):
         """
@@ -159,6 +168,7 @@ class DiffieHellman():
         print("Private Key[{0} bits]: {1}\n".format(self.privateKey.bit_length(), self.privateKey))
         print("Public Key[{0} bits]: {1}\n".format(self.publicKey.bit_length(), self.publicKey))
 
+
     def displayShared (self):
         """
         Display the results of the exchange.
@@ -168,13 +178,35 @@ class DiffieHellman():
         print("Shared Key [{0}]: {1}\n".format(len(self.key), hexlify(self.key)))
 
 
+
 if __name__ == "__main__":
     """
     Test Diffie-Hellman exchange.
     """
 
-    alice = DiffieHellman(2,17,670)
-    bob = DiffieHellman(2,17,540)
+    def exchageTest (generator, group, keyLenght, testLenght = 50):
+        misses = 0
+
+        for i in range(0,testLenght):
+            alice = DiffieHellman(generator, group, keyLenght)
+            bob = DiffieHellman(generator, group, keyLenght)
+
+            alice.generateSharedKey(bob.publicKey)
+            bob.generateSharedKey(alice.publicKey)
+
+            print("============= EXCHANGE RESULT:", i, "of", testLenght)
+            if (alice.getSharedKey() == bob.getSharedKey()):
+                print("Shared keys match!!!")
+            else:
+                print("Shared keys didn't match...")
+                misses+= 1
+
+        print ("\n>>>>> TOTAL MISMATCHES:", misses, "\n")
+
+    # exchageTest(2, 18, 2048)
+    
+    alice = DiffieHellman(2,17,1024)
+    bob = DiffieHellman(2,17,1024)
 
     alice.generateSharedKey(bob.publicKey)
     bob.generateSharedKey(alice.publicKey)
